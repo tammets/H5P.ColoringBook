@@ -5,7 +5,7 @@ H5P.ColoringBook = (function ($) {
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
 
     // Safest possible way to set defaults
-    let colorString = '#000000,#FFFFFF,#FF0000,#00FF00,#0000FF'; // Ultimate fallback
+    let colorString = '#FF0000, #00FF00, #0000FF, #FFFF00, #00FFFF, #FF00FF, #800000, #008000, #000080, #808080'; // Ultimate fallback
     if (this.params.colorPalette && typeof this.params.colorPalette === 'string') {
       colorString = this.params.colorPalette;
     }
@@ -27,6 +27,13 @@ H5P.ColoringBook = (function ($) {
     this.brushSize = this.params.tools.brushSize;
     this.isDrawing = false;
   }
+
+  ColoringBook.prototype.toolIcons = {
+    brush: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M23,3l-7,5L4.031,19.875l1,1L3,25l1,1l-2,2l3,1l1-1l1,1l4-2l1,1l12-12l5-7L23,3z M16.704,10.118 l5.174,5.174l-9.586,9.586l-5.212-5.212L16.704,10.118z M5.427,24.599l1.24-2.518L9.9,25.314l-2.505,1.253L5.427,24.599z M23.155,13.741l-4.897-4.897l4.525-3.232l3.604,3.604L23.155,13.741z"></path></svg>',
+    eraser: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/></svg>',
+    fill: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M21,12.17V6c0-1.206-0.799-3-3-3s-3,1.794-3,3v2.021L10.054,13H6c-1.105,0-2,0.895-2,2v9h2v-7 l12,12l10-10L21,12.17z M18,5c0.806,0,0.988,0.55,1,1v4.17l-2-2V6.012C17.012,5.55,17.194,5,18,5z M18,26l-9-9l6-6v6h2v-6.001L25,19 L18,26z M4,26h2v2H4V26z"></path></svg>',
+    download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>'
+  };
 
   /**
    * Attach function - the only thing that should run.
@@ -96,9 +103,6 @@ H5P.ColoringBook = (function ($) {
       $toolbar.append(this.createToolButton('fill', 'Fill'));
     }
 
-    // Download Button
-    $toolbar.append(this.createToolButton('download', 'Download'));
-
     // Color Palette
     const $colorPalette = $('<div>').addClass('h5p-coloring-book-color-palette');
     this.colors.forEach(function (color) {
@@ -119,6 +123,11 @@ H5P.ColoringBook = (function ($) {
     );
     $toolbar.append($brushSize);
 
+    // Download Button
+    const $downloadButton = this.createToolButton('download', 'Download');
+    $downloadButton.addClass('h5p-coloring-book-download-button');
+    $toolbar.append($downloadButton);
+
     return $toolbar;
   };
 
@@ -126,11 +135,17 @@ H5P.ColoringBook = (function ($) {
     const self = this;
     const $button = $('<div>', {
       class: 'h5p-coloring-book-tool-button',
-      text: label,
       role: 'button',
       tabindex: 0
     });
 
+    const iconSvg = this.toolIcons[tool];
+    if (iconSvg) {
+      $button.append($(iconSvg)).attr('aria-label', label);
+    } else {
+      $button.text(label);
+    }
+    
     if (tool === 'download') {
       $button.on('click keydown', function (e) {
         if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
@@ -144,7 +159,8 @@ H5P.ColoringBook = (function ($) {
           e.preventDefault();
           self.currentTool = tool;
           if (tool === 'brush' || tool === 'eraser' || tool === 'fill') {
-            $(this).addClass('active').siblings('.h5p-coloring-book-tool-button').removeClass('active');
+            $(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
+            $(this).addClass('active');
           }
         }
       });
@@ -197,6 +213,9 @@ H5P.ColoringBook = (function ($) {
         self.saveState();
       }
     });
+
+    // Set the initial active tool
+    this.$container.find('.h5p-coloring-book-tool-button[aria-label="Brush"]').addClass('active');
   };
 
   ColoringBook.prototype.draw = function (x1, y1, x2, y2) {
