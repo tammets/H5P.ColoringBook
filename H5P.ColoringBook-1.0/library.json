@@ -1,0 +1,22 @@
+{
+  "title": "Coloring Book",
+  "description": "A coloring book content type that allows users to color predefined images",
+  "majorVersion": 1,
+  "minorVersion": 0,
+  "patchVersion": 0,
+  "runnable": 1,
+  "author": "Priit Tammets",
+  "license": "MIT",
+  "icon": "icon.svg",
+  "machineName": "H5P.ColoringBook",
+  "preloadedJs": [
+    {
+      "path": "js/coloring-book.js"
+    }
+  ],
+  "preloadedCss": [
+    {
+      "path": "css/coloring-book.css"
+    }
+  ]
+} 

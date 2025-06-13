@@ -1,0 +1,75 @@
+[
+  {
+    "name": "coloringBook",
+    "type": "group",
+    "label": "Coloring Book Settings",
+    "fields": [
+      {
+        "name": "image",
+        "type": "image",
+        "label": "Image to Color",
+        "description": "Upload an image that users will color",
+        "importance": "high"
+      },
+      {
+        "name": "colorPalette",
+        "type": "group",
+        "label": "Color Palette",
+        "fields": [
+          {
+            "name": "colors",
+            "type": "list",
+            "label": "Available Colors",
+            "entity": "color",
+            "min": 1,
+            "max": 20,
+            "field": {
+              "name": "color",
+              "type": "text",
+              "label": "Color",
+              "description": "Enter a hex color code (e.g., #FF0000 for red)",
+              "default": "#FF0000"
+            }
+          }
+        ]
+      },
+      {
+        "name": "tools",
+        "type": "group",
+        "label": "Drawing Tools",
+        "fields": [
+          {
+            "name": "brushSize",
+            "type": "number",
+            "label": "Default Brush Size",
+            "description": "Size of the brush in pixels",
+            "default": 10,
+            "min": 1,
+            "max": 50
+          },
+          {
+            "name": "enableEraser",
+            "type": "boolean",
+            "label": "Enable Eraser Tool",
+            "description": "Allow users to erase their coloring",
+            "default": true
+          },
+          {
+            "name": "enableFill",
+            "type": "boolean",
+            "label": "Enable Fill Tool",
+            "description": "Allow users to fill areas with color",
+            "default": true
+          }
+        ]
+      },
+      {
+        "name": "instructions",
+        "type": "text",
+        "label": "Instructions",
+        "description": "Instructions for the user",
+        "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas."
+      }
+    ]
+  }
+] 

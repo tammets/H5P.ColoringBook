@@ -1,0 +1,15 @@
+{
+  "title": "Coloring Book",
+  "language": "en",
+  "mainLibrary": "H5P.ColoringBook",
+  "embedTypes": [
+    "div"
+  ],
+  "preloadedDependencies": [
+    {
+      "machineName": "H5P.ColoringBook",
+      "majorVersion": 1,
+      "minorVersion": 0
+    }
+  ]
+} 
