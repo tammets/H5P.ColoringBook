@@ -7,7 +7,7 @@
   "runnable": 1,
   "author": "Priit Tammets",
   "license": "MIT",
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "machineName": "H5P.ColoringBook",
   "preloadedJs": [
     {
