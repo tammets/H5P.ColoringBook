@@ -7,8 +7,16 @@ H5P.ColoringBook = (function ($) {
     // Initialize colors
     // Default fallback colors if user doesn't provide any or provides invalid ones
     const defaultFallbackColors = [
-      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF',
-      '#800000', '#008000', '#000080', '#808080'
+      '#FF0000', // Red
+      '#FFA500', // Orange
+      '#FFFF00', // Yellow
+      '#008000', // Green
+      '#0000FF', // Blue
+      '#800080', // Purple
+      '#FFC0CB', // Pink
+      '#FFFFFF', // White
+      '#8B4513', // Brown
+      '#000000'  // Black
     ];
     let userDefinedColors = [];
 
@@ -36,6 +44,7 @@ H5P.ColoringBook = (function ($) {
     this.params.tools.brushSize = this.params.tools.brushSize || 10;
     this.params.tools.enableEraser = this.params.tools.enableEraser !== false;
     this.params.tools.enableFill = this.params.tools.enableFill !== false;
+    this.params.tools.enableTextTool = this.params.tools.enableTextTool === true; // Default to false unless explicitly true
     this.params.instructions = this.params.instructions || '';
 
     this.id = id;
@@ -59,7 +68,8 @@ H5P.ColoringBook = (function ($) {
     eraser: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/></svg>',
     fill: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M21,12.17V6c0-1.206-0.799-3-3-3s-3,1.794-3,3v2.021L10.054,13H6c-1.105,0-2,0.895-2,2v9h2v-7 l12,12l10-10L21,12.17z M18,5c0.806,0,0.988,0.55,1,1v4.17l-2-2V6.012C17.012,5.55,17.194,5,18,5z M18,26l-9-9l6-6v6h2v-6.001L25,19 L18,26z M4,26h2v2H4V26z"></path></svg>',
     download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
-    undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>'
+    undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>',
+    text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>'
   };
 
   /**
@@ -138,23 +148,41 @@ H5P.ColoringBook = (function ($) {
     const self = this;
     const $toolbar = $('<div>').addClass('h5p-coloring-book-toolbar');
 
-    // Tools
-    $toolbar.append(this.createToolButton('brush', 'Brush'));
+    // --- First Row: Main Tools ---
+    const $mainToolsRow = $('<div>').addClass('h5p-coloring-book-toolbar-row h5p-coloring-book-main-tools');
+
+    $mainToolsRow.append(this.createToolButton('brush', 'Brush'));
     if (this.params.tools.enableEraser) {
-      $toolbar.append(this.createToolButton('eraser', 'Eraser'));
+      $mainToolsRow.append(this.createToolButton('eraser', 'Eraser'));
     }
     if (this.params.tools.enableFill) {
-      $toolbar.append(this.createToolButton('fill', 'Fill'));
+      $mainToolsRow.append(this.createToolButton('fill', 'Fill'));
+    }
+    if (this.params.tools.enableTextTool) {
+      $mainToolsRow.append(this.createToolButton('text', 'Add Text'));
     }
 
-    // Color Palette
+    // Undo Button
+    const $undoButton = this.createToolButton('undo', 'Undo');
+    this.$undoButton = $undoButton; // Store for enabling/disabling
+    $mainToolsRow.append($undoButton);
+
+    // Download Button
+    const $downloadButton = this.createToolButton('download', 'Download');
+    $downloadButton.addClass('h5p-coloring-book-download-button');
+    $mainToolsRow.append($downloadButton); 
+
+    $toolbar.append($mainToolsRow);
+
+    // --- Second Row: Colors and Brush Size ---
+    const $secondaryControlsRow = $('<div>').addClass('h5p-coloring-book-toolbar-row h5p-coloring-book-secondary-controls');
+
     const $colorPalette = $('<div>').addClass('h5p-coloring-book-color-palette');
     this.colors.forEach(function (color) {
       $colorPalette.append(self.createColorButton(color));
     });
-    $toolbar.append($colorPalette);
+    $secondaryControlsRow.append($colorPalette);
 
-    // Brush Size
     const $brushSize = $('<div>').addClass('h5p-coloring-book-brush-size').append(
       $('<label>').text('Brush Size: '),
       $('<input>', {
@@ -165,17 +193,9 @@ H5P.ColoringBook = (function ($) {
         change: function () { self.brushSize = $(this).val(); }
       })
     );
-    $toolbar.append($brushSize);
+    $secondaryControlsRow.append($brushSize);
 
-    // Undo Button
-    const $undoButton = this.createToolButton('undo', 'Undo');
-    this.$undoButton = $undoButton; // Store for enabling/disabling
-    $toolbar.append($undoButton);
-
-    // Download Button
-    const $downloadButton = this.createToolButton('download', 'Download');
-    $downloadButton.addClass('h5p-coloring-book-download-button');
-    $toolbar.append($downloadButton); // Download usually last
+    $toolbar.append($secondaryControlsRow);
 
     return $toolbar;
   };
@@ -185,7 +205,8 @@ H5P.ColoringBook = (function ($) {
     const $button = $('<div>', {
       class: 'h5p-coloring-book-tool-button',
       role: 'button',
-      tabindex: 0
+      tabindex: 0,
+      title: label // Add title attribute for tooltip
     });
 
     const iconSvg = this.toolIcons[tool];
@@ -208,12 +229,23 @@ H5P.ColoringBook = (function ($) {
           e.preventDefault();
           self.undoLastAction();
         }
-      }).addClass('disabled'); // Initially disabled
+      }).addClass('disabled'); // Initially disabled    
+    } else if (tool === 'text') {
+      $button.on('click keydown', function (e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          self.currentTool = tool;
+          self.$canvas.css('cursor', 'text');
+          $(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
+          $(this).addClass('active');
+        }
+      });
     } else {
       $button.on('click keydown', function (e) {
         if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           self.currentTool = tool;
+          self.$canvas.css('cursor', 'crosshair'); // Default cursor for drawing tools
           if (tool === 'brush' || tool === 'eraser' || tool === 'fill') {
             $(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
             $(this).addClass('active');
@@ -249,6 +281,11 @@ H5P.ColoringBook = (function ($) {
       if (self.currentTool === 'fill') {
         self.floodFill(e.offsetX, e.offsetY);
         self.pushCurrentStateToHistory();
+        return;
+      }
+      if (self.currentTool === 'text') {
+        // For text tool, action happens on click, no drawing state needed here.
+        self.handleTextToolClick(e.offsetX, e.offsetY);
         return;
       }
       self.isDrawing = true;
@@ -424,6 +461,23 @@ H5P.ColoringBook = (function ($) {
 
     this.params.previousState = prevStateDataUrl; // Update H5P persistent state
     this.updateUndoButtonState();
+  };
+
+  ColoringBook.prototype.handleTextToolClick = function (x, y) {
+    const self = this;
+    const text = window.prompt("Enter text:", ""); // Simple prompt for text input
+    if (text !== null && text.trim() !== "") { // Check if user entered text and didn't cancel
+      self.drawText(text.trim(), x, y);
+      self.pushCurrentStateToHistory(); // Save state after adding text
+    }
+  };
+
+  ColoringBook.prototype.drawText = function (text, x, y) {
+    this.ctx.font = "20px Arial"; // Basic font style, can be made configurable later
+    this.ctx.fillStyle = this.currentColor; // Use the currently selected color
+    this.ctx.textAlign = "left"; // Align text relative to the click point
+    this.ctx.textBaseline = "top";
+    this.ctx.fillText(text, x, y);
   };
 
   ColoringBook.prototype.updateUndoButtonState = function () {

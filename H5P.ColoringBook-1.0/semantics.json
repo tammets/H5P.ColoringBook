@@ -8,7 +8,7 @@
         "name": "image",
         "type": "image",
         "label": "Image to Color",
-        "description": "Upload an image that users will color",
+        "description": "Upload an image that users will color. If now image is provided, a blank canvas will be used.",
         "importance": "high"
       },
       {
@@ -60,6 +60,13 @@
             "label": "Enable Fill Tool",
             "description": "Allow users to fill areas with color",
             "default": true
+          },
+          {
+            "name": "enableTextTool",
+            "type": "boolean",
+            "label": "Enable Text Tool",
+            "description": "Allow users to add text to the image",
+            "default": true
           }
         ]
       },
@@ -68,7 +75,8 @@
         "type": "text",
         "label": "Instructions",
         "description": "Instructions for the user",
-        "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas."
+        "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas.",
+        "widget": "html"
       }
     ]
   }

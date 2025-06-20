@@ -15,13 +15,19 @@
 
 .h5p-coloring-book-toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column; /* Stack rows vertically */
   gap: 10px;
   margin-bottom: 20px;
   padding: 10px;
   background: #f5f5f5;
   border-radius: 4px;
-  align-items: center;
+}
+
+.h5p-coloring-book-toolbar-row {
+  display: flex;
+  flex-wrap: wrap; /* Allow items within a row to wrap if needed */
+  gap: 10px; /* Gap between items in a row */
+  align-items: center; /* Vertically align items in a row */
 }
 
 .h5p-coloring-book-download-button {
@@ -119,7 +125,8 @@
   }
   
   .h5p-coloring-book-toolbar {
-    flex-direction: column;
+    /* flex-direction: column; is already set for default, 
+       so rows will stack. Items within rows will wrap due to .h5p-coloring-book-toolbar-row */
   }
   
   .h5p-coloring-book-color-palette {
