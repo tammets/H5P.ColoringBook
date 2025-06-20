@@ -4,12 +4,33 @@ H5P.ColoringBook = (function ($) {
   function ColoringBook(params, id) {
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
 
-    // Safest possible way to set defaults
-    let colorString = '#FF0000, #00FF00, #0000FF, #FFFF00, #00FFFF, #FF00FF, #800000, #008000, #000080, #808080'; // Ultimate fallback
-    if (this.params.colorPalette && typeof this.params.colorPalette === 'string') {
-      colorString = this.params.colorPalette;
+    // Initialize colors
+    // Default fallback colors if user doesn't provide any or provides invalid ones
+    const defaultFallbackColors = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF',
+      '#800000', '#008000', '#000080', '#808080'
+    ];
+    let userDefinedColors = [];
+
+    // Check if user has defined a color palette and it's in the expected format.
+    // H5P structures this as params.colorPalette.colors,
+    // where 'colors' is an array of objects like [{color: '#HEX'}, ...]
+    if (this.params.colorPalette &&
+        this.params.colorPalette.colors &&
+        Array.isArray(this.params.colorPalette.colors) &&
+        this.params.colorPalette.colors.length > 0) {
+
+      userDefinedColors = this.params.colorPalette.colors
+        .map(item => (item && typeof item.color === 'string' ? item.color.trim() : null))
+        .filter(color => color && /^#([0-9A-F]{3}){1,2}$/i.test(color)); // Validate hex format (e.g., #FFF or #FFFFFF)
     }
-    this.colors = colorString.split(',').map(color => color.trim()).filter(color => color.length > 0);
+
+    if (userDefinedColors.length > 0) {
+      this.colors = userDefinedColors;
+    } else {
+      // Use fallback if no valid user-defined colors are found or if the palette wasn't defined
+      this.colors = defaultFallbackColors;
+    }
 
     this.params.tools = this.params.tools || {};
     this.params.tools.brushSize = this.params.tools.brushSize || 10;
@@ -26,13 +47,19 @@ H5P.ColoringBook = (function ($) {
     this.currentColor = this.colors.length > 0 ? this.colors[0] : '#000000';
     this.brushSize = this.params.tools.brushSize;
     this.isDrawing = false;
+
+    // For Undo functionality
+    this.historyStack = [];
+    this.MAX_HISTORY_STATES = 20; // Max number of undo steps
+    this.$undoButton = null; // Will store the jQuery object for the undo button
   }
 
   ColoringBook.prototype.toolIcons = {
     brush: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M23,3l-7,5L4.031,19.875l1,1L3,25l1,1l-2,2l3,1l1-1l1,1l4-2l1,1l12-12l5-7L23,3z M16.704,10.118 l5.174,5.174l-9.586,9.586l-5.212-5.212L16.704,10.118z M5.427,24.599l1.24-2.518L9.9,25.314l-2.505,1.253L5.427,24.599z M23.155,13.741l-4.897-4.897l4.525-3.232l3.604,3.604L23.155,13.741z"></path></svg>',
     eraser: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/></svg>',
     fill: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M21,12.17V6c0-1.206-0.799-3-3-3s-3,1.794-3,3v2.021L10.054,13H6c-1.105,0-2,0.895-2,2v9h2v-7 l12,12l10-10L21,12.17z M18,5c0.806,0,0.988,0.55,1,1v4.17l-2-2V6.012C17.012,5.55,17.194,5,18,5z M18,26l-9-9l6-6v6h2v-6.001L25,19 L18,26z M4,26h2v2H4V26z"></path></svg>',
-    download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>'
+    download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
+    undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>'
   };
 
   /**
@@ -67,6 +94,7 @@ H5P.ColoringBook = (function ($) {
     // Initialize canvas and context
     this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+    this.historyStack = []; // Initialize history
 
     // Load background image and set canvas size
     const image = new Image();
@@ -74,20 +102,36 @@ H5P.ColoringBook = (function ($) {
     image.onload = function () {
       self.canvas.width = image.width;
       self.canvas.height = image.height;
+      self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
       self.ctx.drawImage(image, 0, 0);
-      self.loadState();
+      self.pushCurrentStateToHistory(); // Save initial state
       H5P.trigger(self, 'resize');
     };
+    image.onerror = function() {
+      console.error("H5P.ColoringBook: Failed to load image. Using blank canvas.");
+      // Fallback to a blank canvas if image loading fails or no image is specified
+      self.canvas.width = self.params.canvasWidth || 800; // Use a default or configured size
+      self.canvas.height = self.params.canvasHeight || 600;
+      self.ctx.fillStyle = '#FFFFFF'; // Fill with white
+      self.ctx.fillRect(0, 0, self.canvas.width, self.canvas.height);
+      self.pushCurrentStateToHistory(); // Save initial blank state
+      H5P.trigger(self, 'resize');
+    };
+
     if (this.params.image && this.params.image.path) {
       image.src = H5P.getPath(this.params.image.path, this.id);
+    } else if (this.params.previousState) { // Check for previousState if no new image path
+      image.src = this.params.previousState;
     } else {
-      this.canvas.width = 800;
-      this.canvas.height = 600;
-      this.loadState();
-      H5P.trigger(self, 'resize');
+      // No image path and no previous state, trigger onerror to set up blank canvas
+      image.dispatchEvent(new Event('error'));
     }
 
     this.setupEventListeners();
+    // Update undo button state after toolbar is created and initial state is pushed
+    if (this.$undoButton) {
+      this.updateUndoButtonState();
+    }
   };
 
   ColoringBook.prototype.createToolbar = function () {
@@ -123,10 +167,15 @@ H5P.ColoringBook = (function ($) {
     );
     $toolbar.append($brushSize);
 
+    // Undo Button
+    const $undoButton = this.createToolButton('undo', 'Undo');
+    this.$undoButton = $undoButton; // Store for enabling/disabling
+    $toolbar.append($undoButton);
+
     // Download Button
     const $downloadButton = this.createToolButton('download', 'Download');
     $downloadButton.addClass('h5p-coloring-book-download-button');
-    $toolbar.append($downloadButton);
+    $toolbar.append($downloadButton); // Download usually last
 
     return $toolbar;
   };
@@ -153,6 +202,13 @@ H5P.ColoringBook = (function ($) {
           self.downloadImage();
         }
       });
+    } else if (tool === 'undo') {
+      $button.on('click keydown', function (e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          self.undoLastAction();
+        }
+      }).addClass('disabled'); // Initially disabled
     } else {
       $button.on('click keydown', function (e) {
         if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
@@ -192,7 +248,7 @@ H5P.ColoringBook = (function ($) {
     this.$canvas.on('mousedown', function (e) {
       if (self.currentTool === 'fill') {
         self.floodFill(e.offsetX, e.offsetY);
-        self.saveState();
+        self.pushCurrentStateToHistory();
         return;
       }
       self.isDrawing = true;
@@ -210,7 +266,7 @@ H5P.ColoringBook = (function ($) {
     this.$canvas.on('mouseup mouseout', function () {
       if (self.isDrawing) {
         self.isDrawing = false;
-        self.saveState();
+        self.pushCurrentStateToHistory();
       }
     });
 
@@ -330,20 +386,55 @@ H5P.ColoringBook = (function ($) {
     link.click();
   };
 
-  ColoringBook.prototype.saveState = function () {
-    const data = this.canvas.toDataURL();
-    this.params.previousState = data;
+  ColoringBook.prototype.pushCurrentStateToHistory = function () {
+    if (!this.canvas || !this.ctx) return; // Ensure canvas is ready
+
+    const dataUrl = this.canvas.toDataURL();
+
+    // Avoid pushing identical consecutive states (e.g., fill with same color)
+    if (this.historyStack.length > 0 && this.historyStack[this.historyStack.length - 1] === dataUrl) {
+      return;
+    }
+
+    this.historyStack.push(dataUrl);
+
+    if (this.historyStack.length > this.MAX_HISTORY_STATES) {
+      this.historyStack.shift(); // Remove the oldest state to limit history size
+    }
+
+    this.params.previousState = dataUrl; // Update H5P persistent state
+    this.updateUndoButtonState();
   };
 
-  ColoringBook.prototype.loadState = function () {
-    if (this.params.previousState) {
-      const img = new Image();
-      img.onload = () => {
-        this.ctx.drawImage(img, 0, 0);
-      };
-      img.src = this.params.previousState;
+  ColoringBook.prototype.undoLastAction = function () {
+    if (this.historyStack.length <= 1) {
+      return; // Cannot undo if only one (initial) state or no states
+    }
+
+    this.historyStack.pop(); // Remove the current state from history
+    const prevStateDataUrl = this.historyStack[this.historyStack.length - 1];
+
+    const img = new Image();
+    const self = this;
+    img.onload = function () {
+      self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height); // Clear canvas
+      self.ctx.drawImage(img, 0, 0); // Draw previous state
+    };
+    img.src = prevStateDataUrl;
+
+    this.params.previousState = prevStateDataUrl; // Update H5P persistent state
+    this.updateUndoButtonState();
+  };
+
+  ColoringBook.prototype.updateUndoButtonState = function () {
+    if (this.$undoButton) {
+      if (this.historyStack.length > 1) {
+        this.$undoButton.removeClass('disabled').attr('tabindex', 0).removeAttr('aria-disabled');
+      } else {
+        this.$undoButton.addClass('disabled').attr('tabindex', -1).attr('aria-disabled', 'true');
+      }
     }
   };
 
   return ColoringBook;
-})(window.jQuery); 
+})(window.jQuery || H5P.jQuery);

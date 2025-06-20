@@ -44,6 +44,12 @@
   transition: all 0.2s ease;
 }
 
+.h5p-coloring-book-tool-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #e0e0e0; /* Lighter background for disabled state */
+}
+
 .h5p-coloring-book-tool-button:hover {
   background: #f0f0f0;
 }
