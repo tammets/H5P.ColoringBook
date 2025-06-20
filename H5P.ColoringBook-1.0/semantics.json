@@ -12,28 +12,6 @@
         "importance": "high"
       },
       {
-        "name": "colorPalette",
-        "type": "group",
-        "label": "Color Palette",
-        "fields": [
-          {
-            "name": "colors",
-            "type": "list",
-            "label": "Available Colors",
-            "entity": "color",
-            "min": 1,
-            "max": 20,
-            "field": {
-              "name": "color",
-              "type": "text",
-              "label": "Color",
-              "description": "Enter a hex color code (e.g., #FF0000 for red)",
-              "default": "#FF0000"
-            }
-          }
-        ]
-      },
-      {
         "name": "tools",
         "type": "group",
         "label": "Drawing Tools",

@@ -18,27 +18,9 @@ H5P.ColoringBook = (function ($) {
       '#8B4513', // Brown
       '#000000'  // Black
     ];
-    let userDefinedColors = [];
-
-    // Check if user has defined a color palette and it's in the expected format.
-    // H5P structures this as params.colorPalette.colors,
-    // where 'colors' is an array of objects like [{color: '#HEX'}, ...]
-    if (this.params.colorPalette &&
-        this.params.colorPalette.colors &&
-        Array.isArray(this.params.colorPalette.colors) &&
-        this.params.colorPalette.colors.length > 0) {
-
-      userDefinedColors = this.params.colorPalette.colors
-        .map(item => (item && typeof item.color === 'string' ? item.color.trim() : null))
-        .filter(color => color && /^#([0-9A-F]{3}){1,2}$/i.test(color)); // Validate hex format (e.g., #FFF or #FFFFFF)
-    }
-
-    if (userDefinedColors.length > 0) {
-      this.colors = userDefinedColors;
-    } else {
-      // Use fallback if no valid user-defined colors are found or if the palette wasn't defined
-      this.colors = defaultFallbackColors;
-    }
+    
+    // Always use the default fallback colors
+    this.colors = defaultFallbackColors;
 
     this.params.tools = this.params.tools || {};
     this.params.tools.brushSize = this.params.tools.brushSize || 10;
@@ -69,7 +51,8 @@ H5P.ColoringBook = (function ($) {
     fill: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M21,12.17V6c0-1.206-0.799-3-3-3s-3,1.794-3,3v2.021L10.054,13H6c-1.105,0-2,0.895-2,2v9h2v-7 l12,12l10-10L21,12.17z M18,5c0.806,0,0.988,0.55,1,1v4.17l-2-2V6.012C17.012,5.55,17.194,5,18,5z M18,26l-9-9l6-6v6h2v-6.001L25,19 L18,26z M4,26h2v2H4V26z"></path></svg>',
     download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
     undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>',
-    text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>'
+    text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>',
+    loadImage: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>'
   };
 
   /**
@@ -161,6 +144,9 @@ H5P.ColoringBook = (function ($) {
     if (this.params.tools.enableTextTool) {
       $mainToolsRow.append(this.createToolButton('text', 'Add Text'));
     }
+    
+    // Load Image button
+    $mainToolsRow.append(this.createToolButton('loadImage', 'Load Image'));
 
     // Undo Button
     const $undoButton = this.createToolButton('undo', 'Undo');
@@ -229,7 +215,14 @@ H5P.ColoringBook = (function ($) {
           e.preventDefault();
           self.undoLastAction();
         }
-      }).addClass('disabled'); // Initially disabled    
+      }).addClass('disabled'); // Initially disabled
+    } else if (tool === 'loadImage') {
+      $button.on('click keydown', function (e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          self.promptForImage();
+        }
+      });
     } else if (tool === 'text') {
       $button.on('click keydown', function (e) {
         if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
@@ -461,6 +454,68 @@ H5P.ColoringBook = (function ($) {
 
     this.params.previousState = prevStateDataUrl; // Update H5P persistent state
     this.updateUndoButtonState();
+  };
+
+  ColoringBook.prototype.promptForImage = function () {
+    const self = this;
+    // Directly trigger hidden file input for local upload
+    let $fileInput = this.$container.find('.h5p-coloring-book-file-input');
+    if (!$fileInput.length) {
+      $fileInput = $('<input type="file" class="h5p-coloring-book-file-input" accept="image/*" style="display:none">')
+        .on('change', function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            // Basic file size check (e.g., 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+              alert("File is too large. Please choose an image under 5MB.");
+              $(this).val(''); // Reset file input for next use
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              self.loadNewImageOntoCanvas(event.target.result, "User Uploaded Image");
+            };
+            reader.onerror = function () {
+              alert("Error reading file.");
+            };
+            reader.readAsDataURL(file);
+            $(this).val(''); // Reset file input for next use
+          }
+        });
+      this.$container.append($fileInput);
+    }
+    $fileInput.trigger('click');
+  };
+
+  ColoringBook.prototype.loadNewImageOntoCanvas = function (imageSrc, sourceDescription) {
+    const self = this;
+    const newImage = new Image();
+    newImage.crossOrigin = "Anonymous"; // Important for external URLs and canvas operations
+    newImage.onload = function () {
+      self.historyStack = []; // Clear history for the new image
+
+      const naturalWidth = newImage.width;
+      const naturalHeight = newImage.height;
+      
+      // Use current canvas width as the target width.
+      // Height will be scaled proportionally to maintain aspect ratio.
+      const targetCanvasWidth = self.canvas.width; 
+      const targetCanvasHeight = (naturalHeight / naturalWidth) * targetCanvasWidth;
+
+      self.canvas.height = targetCanvasHeight; // Width remains, height adjusts
+      // self.canvas.width is already set and remains the target width
+
+      self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
+      self.ctx.drawImage(newImage, 0, 0, self.canvas.width, self.canvas.height); // Draw scaled image
+      self.pushCurrentStateToHistory(); // Save the new base image as the first history state
+      H5P.trigger(self, 'resize'); // Notify H5P core about size change
+      console.log("H5P.ColoringBook: Loaded new image - " + sourceDescription);
+    };
+    newImage.onerror = function () {
+      alert("Error loading image: " + sourceDescription + ". Please check the file.");
+      console.error("H5P.ColoringBook: Error loading image from " + imageSrc);
+    };
+    newImage.src = imageSrc;
   };
 
   ColoringBook.prototype.handleTextToolClick = function (x, y) {
