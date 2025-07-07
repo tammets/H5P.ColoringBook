@@ -7,7 +7,7 @@ An H5P content type that allows teachers to create interactive coloring book act
 This content type enables:
 - Teachers to upload outline images for coloring
 - Customisable drawing tools and colors
-- Students to color images using various tools, including brush, eraser, fill, and text
+- Students to color and edit images using various tools, including brush, eraser, fill, and text
 - Students can load their own images and download their creations
 - Fullscreen mode for an immersive experience
 - Responsive design for all devices
@@ -23,7 +23,7 @@ This content type enables:
   - **Undo/Redo**: Revert or reapply changes with a history stack
   - **Load Image**: Upload and color your own images
   - **Download Image**: Save your colored artwork as a PNG file
-  - **Fullscreen Mode**: Toggle fullscreen for an immersive coloring experience
+  - **Fullscreen Mode**: Toggle fullscreen for a better coloring experience
 - **Responsive Design**: Works on both desktop and mobile devices
 
 ## Installation
@@ -39,9 +39,8 @@ This content type enables:
 1. Create a new H5P Coloring Book activity
 2. Upload an outline image for students to color
 3. (Optional) Customise:
-   - Available tools (brush, eraser, fill, text)
-   - Brush size
    - Instructions for students
+   - Set canvas size
 4. Save and publish
 
 ### For Students
@@ -54,7 +53,7 @@ This content type enables:
 6. Load your own image onto the canvas using the "Load Image" button.
 7. Undo your last action using the "Undo" button.
 8. Download your finished coloring as a PNG image using the "Download" button.
-9. Toggle fullscreen mode for a more immersive experience.
+9. Toggle fullscreen mode.
 
 ## Contributing
 
