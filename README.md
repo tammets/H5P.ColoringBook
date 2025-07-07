@@ -6,18 +6,24 @@ An H5P content type that allows teachers to create interactive coloring book act
 
 This content type enables:
 - Teachers to upload outline images for coloring
-- Customisable drawing tools
-- Students to color images using brush, eraser, and fill tools
+- Customisable drawing tools and colors
+- Students to color images using various tools, including brush, eraser, fill, and text
+- Students can load their own images and download their creations
+- Fullscreen mode for an immersive experience
 - Responsive design for all devices
 
 ## Features
 
 - **Simple Editor Interface**: Upload an image and configure available colors and tools
 - **Interactive Student View**:
-  - Brush, eraser, and fill tools
+  - Brush, eraser, fill, and text tools
   - Adjustable brush size
   - Fixed color palette
   - Instructions display
+  - **Undo/Redo**: Revert or reapply changes with a history stack
+  - **Load Image**: Upload and color your own images
+  - **Download Image**: Save your colored artwork as a PNG file
+  - **Fullscreen Mode**: Toggle fullscreen for an immersive coloring experience
 - **Responsive Design**: Works on both desktop and mobile devices
 
 ## Installation
@@ -40,11 +46,15 @@ This content type enables:
 
 ### For Students
 
-1. Use the provided tools to color the image
-2. Select colors from the palette
-3. Adjust brush size as needed
-4. Use the eraser or fill tool if enabled
-5. Add text and upload your own image as canvas
+1. Use the provided tools to color the image.
+2. Select colors from the palette.
+3. Adjust brush size as needed.
+4. Use the eraser or fill tool if enabled.
+5. Add text to the canvas using the text tool.
+6. Load your own image onto the canvas using the "Load Image" button.
+7. Undo your last action using the "Undo" button.
+8. Download your finished coloring as a PNG image using the "Download" button.
+9. Toggle fullscreen mode for a more immersive experience.
 
 ## Contributing
 
@@ -60,4 +70,4 @@ For issues and feature requests, please use the GitHub issue tracker.
 
 ## Credits
 
-Priit Tammets 
+Priit Tammets
