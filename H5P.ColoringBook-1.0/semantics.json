@@ -12,6 +12,22 @@
         "importance": "high"
       },
       {
+        "name": "maxWidth",
+        "type": "number",
+        "label": "Maximum Image Width",
+        "description": "Set the maximum width for the coloring image in pixels. The image will be scaled down to fit if it's larger.",
+        "default": 800,
+        "min": 100
+      },
+      {
+        "name": "maxHeight",
+        "type": "number",
+        "label": "Maximum Image Height",
+        "description": "Set the maximum height for the coloring image in pixels. The image will be scaled down to fit if it's larger.",
+        "default": 600,
+        "min": 100
+      },
+      {
         "name": "tools",
         "type": "group",
         "label": "Drawing Tools",
@@ -54,8 +70,8 @@
         "label": "Instructions",
         "description": "Instructions for the user",
         "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas.",
-        "widget": "html"
+        "widget": "textarea"
       }
     ]
   }
-] 
+]

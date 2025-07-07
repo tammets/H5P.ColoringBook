@@ -10,7 +10,14 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-bottom: 20px;
-  overflow: hidden;
+  overflow: auto; /* Use auto to only show scrollbars when needed */
+  max-width: 100%; /* Ensure the container doesn't exceed its parent's width */
+}
+
+canvas {
+  max-width: 100%;
+  height: auto;
+  display: block; /* Remove extra space below the canvas */
 }
 
 .h5p-coloring-book-toolbar {
@@ -124,12 +131,8 @@
     padding: 10px;
   }
   
-  .h5p-coloring-book-toolbar {
-    /* flex-direction: column; is already set for default, 
-       so rows will stack. Items within rows will wrap due to .h5p-coloring-book-toolbar-row */
-  }
   
   .h5p-coloring-book-color-palette {
     justify-content: center;
   }
-} 
+}

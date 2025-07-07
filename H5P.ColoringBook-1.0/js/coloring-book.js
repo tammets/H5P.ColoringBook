@@ -52,7 +52,9 @@ H5P.ColoringBook = (function ($) {
     download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
     undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>',
     text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>',
-    loadImage: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>'
+    loadImage: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>',
+    fullscreen: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15.75M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9m5.25 11.25v-4.5m0 4.5h-4.5m4.5 0L15 15.75" /></svg>',
+    exitFullscreen: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15L3.75 20.25M15 9V4.5M15 9H19.5M15 9L20.25 3.75M15 15v4.5M15 15H19.5M15 15L20.25 20.25" /></svg>'
   };
 
   /**
@@ -78,7 +80,9 @@ H5P.ColoringBook = (function ($) {
     const $toolbar = this.createToolbar();
 
     if (this.params.instructions) {
-      $container.append($('<div>').addClass('h5p-coloring-book-instructions').html(this.params.instructions));
+      // Since the input is now from a textarea, we need to convert newlines to <br> tags
+      const instructionsText = this.params.instructions.replace(/\n/g, '<br>');
+      $container.append($('<div>').addClass('h5p-coloring-book-instructions').html(instructionsText));
     }
 
     $container.append($toolbar);
@@ -93,12 +97,31 @@ H5P.ColoringBook = (function ($) {
     const image = new Image();
     image.crossOrigin = 'Anonymous';
     image.onload = function () {
-      self.canvas.width = image.width;
-      self.canvas.height = image.height;
+      let width = image.width;
+      let height = image.height;
+      const maxWidth = self.params.maxWidth || 800;
+      const maxHeight = self.params.maxHeight || 600;
+
+      if (width > maxWidth) {
+        height = (maxWidth / width) * height;
+        width = maxWidth;
+      }
+
+      if (height > maxHeight) {
+        width = (maxHeight / height) * width;
+        height = maxHeight;
+      }
+
+      self.canvas.width = width;
+      self.canvas.height = height;
       self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
-      self.ctx.drawImage(image, 0, 0);
+      self.ctx.drawImage(image, 0, 0, width, height);
       self.pushCurrentStateToHistory(); // Save initial state
-      H5P.trigger(self, 'resize');
+      if (H5P.trigger) { // Defensive check
+        H5P.trigger(self, 'resize');
+      } else {
+        console.warn("H5P.trigger is not available, cannot trigger resize event on image load.");
+      }
     };
     image.onerror = function() {
       console.error("H5P.ColoringBook: Failed to load image. Using blank canvas.");
@@ -108,7 +131,11 @@ H5P.ColoringBook = (function ($) {
       self.ctx.fillStyle = '#FFFFFF'; // Fill with white
       self.ctx.fillRect(0, 0, self.canvas.width, self.canvas.height);
       self.pushCurrentStateToHistory(); // Save initial blank state
-      H5P.trigger(self, 'resize');
+      if (H5P.trigger) { // Defensive check
+        H5P.trigger(self, 'resize');
+      } else {
+        console.warn("H5P.trigger is not available, cannot trigger resize event on image load error.");
+      }
     };
 
     if (this.params.image && this.params.image.path) {
@@ -124,6 +151,19 @@ H5P.ColoringBook = (function ($) {
     // Update undo button state after toolbar is created and initial state is pushed
     if (this.$undoButton) {
       this.updateUndoButtonState();
+    }
+
+    // Fullscreen event listeners
+    const $fullscreenButton = this.$container.find('.h5p-coloring-book-tool-button[aria-label="Fullscreen"]');
+    if ($fullscreenButton.length) {
+      this.on('enterFullScreen', function () {
+        $fullscreenButton.find('svg').replaceWith($(self.toolIcons.exitFullscreen));
+        $fullscreenButton.attr('title', 'Exit Fullscreen').attr('aria-label', 'Exit Fullscreen');
+      });
+      this.on('exitFullScreen', function () {
+        $fullscreenButton.find('svg').replaceWith($(self.toolIcons.fullscreen));
+        $fullscreenButton.attr('title', 'Fullscreen').attr('aria-label', 'Fullscreen');
+      });
     }
   };
 
@@ -156,7 +196,19 @@ H5P.ColoringBook = (function ($) {
     // Download Button
     const $downloadButton = this.createToolButton('download', 'Download');
     $downloadButton.addClass('h5p-coloring-book-download-button');
-    $mainToolsRow.append($downloadButton); 
+    $mainToolsRow.append($downloadButton);
+
+    // Fullscreen Button (only if supported)
+    if (H5P.canHasFullScreen !== false) {
+      const $fullscreenButton = this.createToolButton('fullscreen', 'Fullscreen');
+      $fullscreenButton.on('click keydown', function (e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          self.toggleFullScreen();
+        }
+      });
+      $mainToolsRow.append($fullscreenButton);
+    }
 
     $toolbar.append($mainToolsRow);
 
@@ -508,7 +560,11 @@ H5P.ColoringBook = (function ($) {
       self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
       self.ctx.drawImage(newImage, 0, 0, self.canvas.width, self.canvas.height); // Draw scaled image
       self.pushCurrentStateToHistory(); // Save the new base image as the first history state
-      H5P.trigger(self, 'resize'); // Notify H5P core about size change
+      if (H5P.trigger) { // Defensive check
+        H5P.trigger(self, 'resize'); // Notify H5P core about size change
+      } else {
+        console.warn("H5P.trigger is not available, cannot trigger resize event after loading new image.");
+      }
       console.log("H5P.ColoringBook: Loaded new image - " + sourceDescription);
     };
     newImage.onerror = function () {
@@ -542,6 +598,17 @@ H5P.ColoringBook = (function ($) {
       } else {
         this.$undoButton.addClass('disabled').attr('tabindex', -1).attr('aria-disabled', 'true');
       }
+    }
+  };
+
+  /**
+   * Toggle fullscreen mode.
+   */
+  ColoringBook.prototype.toggleFullScreen = function () {
+    if (H5P.isFullscreen) {
+      H5P.exitFullScreen();
+    } else {
+      H5P.fullScreen(this.$container, this); // Pass the H5P instance
     }
   };
 
