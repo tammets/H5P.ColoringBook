@@ -1,32 +1,6 @@
 var H5P = H5P || {};
 
 H5P.ColoringBook = (function ($) {
-  // Defensive check for jQuery availability
-  if (!$ || typeof $ !== 'function') {
-    console.error('H5P.ColoringBook: jQuery is not available. Cannot initialize the content type.');
-    console.log('Available globals:', {
-      'H5P': typeof H5P,
-      'H5P.jQuery': typeof (H5P && H5P.jQuery),
-      'jQuery': typeof jQuery,
-      '$': typeof $
-    });
-    
-    // Return a stub constructor that shows an error message
-    function ColoringBookStub() {
-      this.attach = function($container) {
-        var errorHtml = '<div style="padding: 20px; background: #ffebee; border: 1px solid #f44336; border-radius: 4px; color: #c62828; text-align: center; font-family: Arial, sans-serif;">' +
-          '<h3 style="margin: 0 0 10px 0; color: #d32f2f;">H5P Coloring Book Error</h3>' +
-          '<p style="margin: 0;">jQuery is not available. Please ensure H5P is properly configured and loaded.</p>' +
-          '</div>';
-        if ($container && typeof $container.html === 'function') {
-          $container.html(errorHtml);
-        } else if ($container && $container.innerHTML !== undefined) {
-          $container.innerHTML = errorHtml;
-        }
-      };
-    }
-    return ColoringBookStub;
-  }
   function ColoringBook(params, id) {
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
 
@@ -89,15 +63,6 @@ H5P.ColoringBook = (function ($) {
    * @param {H5P.jQuery} $container
    */
   ColoringBook.prototype.attach = function ($container) {
-    // Additional defensive check within attach method
-    if (!$ || typeof $ !== 'function') {
-      console.error('H5P.ColoringBook: jQuery not available in attach method');
-      if ($container && $container.html) {
-        $container.html('<div style="padding: 20px; color: red; text-align: center;">Error: jQuery is not available. Please ensure H5P is properly configured.</div>');
-      }
-      return;
-    }
-
     const self = this;
     this.$container = $container;
     $container.addClass('h5p-coloring-book');
@@ -648,17 +613,4 @@ H5P.ColoringBook = (function ($) {
   };
 
   return ColoringBook;
-})(function() {
-  // Try to find jQuery in multiple places
-  if (typeof H5P !== 'undefined' && H5P.jQuery) {
-    return H5P.jQuery;
-  }
-  if (typeof jQuery !== 'undefined') {
-    return jQuery;
-  }
-  if (typeof $ !== 'undefined') {
-    return $;
-  }
-  // If no jQuery found, return null to trigger error handling
-  return null;
-}());
+})(H5P.jQuery);

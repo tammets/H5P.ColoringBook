@@ -9,10 +9,6 @@
   "license": "MIT",
   "icon": "icon.png",
   "machineName": "H5P.ColoringBook",
-  "coreApi": {
-    "majorVersion": 1,
-    "minorVersion": 0
-  },
   "preloadedJs": [
     {
       "path": "js/coloring-book.js"
