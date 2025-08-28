@@ -613,4 +613,4 @@ H5P.ColoringBook = (function ($) {
   };
 
   return ColoringBook;
-})(window.jQuery || H5P.jQuery);
+})(H5P.jQuery);
