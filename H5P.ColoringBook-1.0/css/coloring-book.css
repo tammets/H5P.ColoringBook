@@ -3,6 +3,7 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
+  color: #000; /* Ensure readable default text color */
 }
 
 .h5p-coloring-book-canvas-container {
@@ -28,6 +29,7 @@ canvas {
   padding: 10px;
   background: #f5f5f5;
   border-radius: 4px;
+  color: #000; /* Ensure icons/text use black by default */
 }
 
 .h5p-coloring-book-toolbar-row {
@@ -45,7 +47,7 @@ canvas {
 .h5p-coloring-book-download-button svg {
   width: 24px;
   height: 24px;
-  stroke: #333;
+  stroke: currentColor;
 }
 
 .h5p-coloring-book-tool-button {
@@ -71,6 +73,8 @@ canvas {
   width: 20px;
   height: 20px;
   display: block;
+  fill: currentColor;
+  stroke: currentColor;
 }
 
 .h5p-coloring-book-tool-button.active {
@@ -81,6 +85,7 @@ canvas {
 
 .h5p-coloring-book-tool-button.active svg {
   fill: #fff;
+  stroke: #fff;
 }
 
 .h5p-coloring-book-color-palette {
@@ -123,6 +128,7 @@ canvas {
   background: #f8f9fa;
   border-left: 4px solid #007bff;
   border-radius: 4px;
+  color: #000; /* Instruction text readable */
 }
 
 /* Responsive adjustments */

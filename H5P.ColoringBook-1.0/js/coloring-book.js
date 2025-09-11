@@ -1,6 +1,18 @@
 var H5P = H5P || {};
 
 H5P.ColoringBook = (function ($) {
+  // jQuery fallback shim: ensure `$` resolves to a jQuery function
+  if (typeof $ !== 'function') {
+    if (typeof H5P !== 'undefined' && typeof H5P.jQuery === 'function') {
+      $ = H5P.jQuery;
+    }
+    else if (typeof window !== 'undefined' && typeof window.jQuery === 'function') {
+      $ = window.jQuery;
+    }
+    else {
+      throw new Error('jQuery is not available for H5P.ColoringBook');
+    }
+  }
   function ColoringBook(params, id) {
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
 
@@ -49,9 +61,9 @@ H5P.ColoringBook = (function ($) {
     brush: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M23,3l-7,5L4.031,19.875l1,1L3,25l1,1l-2,2l3,1l1-1l1,1l4-2l1,1l12-12l5-7L23,3z M16.704,10.118 l5.174,5.174l-9.586,9.586l-5.212-5.212L16.704,10.118z M5.427,24.599l1.24-2.518L9.9,25.314l-2.505,1.253L5.427,24.599z M23.155,13.741l-4.897-4.897l4.525-3.232l3.604,3.604L23.155,13.741z"></path></svg>',
     eraser: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"/></svg>',
     fill: '<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M21,12.17V6c0-1.206-0.799-3-3-3s-3,1.794-3,3v2.021L10.054,13H6c-1.105,0-2,0.895-2,2v9h2v-7 l12,12l10-10L21,12.17z M18,5c0.806,0,0.988,0.55,1,1v4.17l-2-2V6.012C17.012,5.55,17.194,5,18,5z M18,26l-9-9l6-6v6h2v-6.001L25,19 L18,26z M4,26h2v2H4V26z"></path></svg>',
-    download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
-    undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>',
-    text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802" /></svg>',
+    download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
+    undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m15 15-6 6m0 0-6-6m6 6V9a6 6 0 0 1 12 0v3" /></svg>',
+    text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>',
     loadImage: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>',
     fullscreen: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15.75M20.25 3.75v4.5m0-4.5h-4.5m4.5 0L15 9m5.25 11.25v-4.5m0 4.5h-4.5m4.5 0L15 15.75" /></svg>',
     exitFullscreen: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15L3.75 20.25M15 9V4.5M15 9H19.5M15 9L20.25 3.75M15 15v4.5M15 15H19.5M15 15L20.25 20.25" /></svg>'
@@ -323,26 +335,37 @@ H5P.ColoringBook = (function ($) {
     const self = this;
 
     this.$canvas.on('mousedown', function (e) {
+      const rect = self.canvas.getBoundingClientRect();
+      const scaleX = self.canvas.width / rect.width;
+      const scaleY = self.canvas.height / rect.height;
+      const cx = Math.floor((e.clientX - rect.left) * scaleX);
+      const cy = Math.floor((e.clientY - rect.top) * scaleY);
+
       if (self.currentTool === 'fill') {
-        self.floodFill(e.offsetX, e.offsetY);
+        self.floodFill(cx, cy);
         self.pushCurrentStateToHistory();
         return;
       }
       if (self.currentTool === 'text') {
         // For text tool, action happens on click, no drawing state needed here.
-        self.handleTextToolClick(e.offsetX, e.offsetY);
+        self.handleTextToolClick(cx, cy);
         return;
       }
       self.isDrawing = true;
-      self.lastX = e.offsetX;
-      self.lastY = e.offsetY;
+      self.lastX = cx;
+      self.lastY = cy;
     });
 
     this.$canvas.on('mousemove', function (e) {
       if (!self.isDrawing) return;
-      self.draw(self.lastX, self.lastY, e.offsetX, e.offsetY);
-      self.lastX = e.offsetX;
-      self.lastY = e.offsetY;
+      const rect = self.canvas.getBoundingClientRect();
+      const scaleX = self.canvas.width / rect.width;
+      const scaleY = self.canvas.height / rect.height;
+      const cx = Math.floor((e.clientX - rect.left) * scaleX);
+      const cy = Math.floor((e.clientY - rect.top) * scaleY);
+      self.draw(self.lastX, self.lastY, cx, cy);
+      self.lastX = cx;
+      self.lastY = cy;
     });
 
     this.$canvas.on('mouseup mouseout', function () {
