@@ -73,8 +73,6 @@ canvas {
   width: 20px;
   height: 20px;
   display: block;
-  fill: currentColor;
-  stroke: currentColor;
 }
 
 .h5p-coloring-book-tool-button.active {

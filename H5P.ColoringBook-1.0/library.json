@@ -3,11 +3,11 @@
   "description": "A coloring book content type that allows users to color predefined images",
   "majorVersion": 1,
   "minorVersion": 0,
-  "patchVersion": 15,
+  "patchVersion": 25,
   "runnable": 1,
   "author": "Priit Tammets",
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "icon.svg",
   "machineName": "H5P.ColoringBook",
   "preloadedJs": [
     {
