@@ -126,7 +126,7 @@ canvas {
   background: #f8f9fa;
   border-left: 4px solid #007bff;
   border-radius: 4px;
-  color: #000; /* Instruction text readable */
+  color: #000;
 }
 
 /* Responsive adjustments */

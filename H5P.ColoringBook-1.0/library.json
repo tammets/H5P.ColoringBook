@@ -3,7 +3,7 @@
   "description": "A coloring book content type that allows users to color predefined images",
   "majorVersion": 1,
   "minorVersion": 0,
-  "patchVersion": 25,
+  "patchVersion": 26,
   "runnable": 1,
   "author": "Priit Tammets",
   "license": "MIT",

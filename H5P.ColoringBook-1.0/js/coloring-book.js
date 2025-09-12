@@ -1,23 +1,15 @@
 var H5P = H5P || {};
 
 H5P.ColoringBook = (function ($) {
-  // jQuery fallback shim: ensure `$` resolves to a jQuery function
+  $ = $ || (typeof H5P !== 'undefined' && H5P.jQuery) || (typeof window !== 'undefined' && window.jQuery);
   if (typeof $ !== 'function') {
-    if (typeof H5P !== 'undefined' && typeof H5P.jQuery === 'function') {
-      $ = H5P.jQuery;
-    }
-    else if (typeof window !== 'undefined' && typeof window.jQuery === 'function') {
-      $ = window.jQuery;
-    }
-    else {
-      throw new Error('jQuery is not available for H5P.ColoringBook');
-    }
+    throw new Error('jQuery is not available for H5P.ColoringBook');
   }
+  // ...existing code...
   function ColoringBook(params, id) {
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
 
     // Initialize colors
-    // Default fallback colors if user doesn't provide any or provides invalid ones
     const defaultFallbackColors = [
       '#FF0000', // Red
       '#FFA500', // Orange
