@@ -1,10 +1,6 @@
 var H5P = H5P || {};
 
-H5P.ColoringBook = (function ($) {
-  $ = $ || (typeof H5P !== 'undefined' && H5P.jQuery) || (typeof window !== 'undefined' && window.jQuery);
-  if (typeof $ !== 'function') {
-    throw new Error('jQuery is not available for H5P.ColoringBook');
-  }
+H5P.ColoringBook = (function () {
   // ...existing code...
   function ColoringBook(params, id) {
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
@@ -74,11 +70,11 @@ ColoringBook.prototype.toolIcons = {
 
     // Create main content structure
     const canvasId = 'h5p-coloring-book-canvas-' + this.id;
-    this.$canvas = $('<canvas>')
+    this.$canvas = H5P.jQuery('<canvas>')
       .attr('id', canvasId)
       .css({ cursor: 'crosshair' });
 
-    this.$canvasContainer = $('<div>')
+    this.$canvasContainer = H5P.jQuery('<div>')
       .addClass('h5p-coloring-book-canvas-container')
       .append(this.$canvas);
 
@@ -87,7 +83,7 @@ ColoringBook.prototype.toolIcons = {
     if (this.params.instructions) {
       // Since the input is now from a textarea, we need to convert newlines to <br> tags
       const instructionsText = this.params.instructions.replace(/\n/g, '<br>');
-      $container.append($('<div>').addClass('h5p-coloring-book-instructions').html(instructionsText));
+      $container.append(H5P.jQuery('<div>').addClass('h5p-coloring-book-instructions').html(instructionsText));
     }
 
     $container.append($toolbar);
@@ -162,11 +158,11 @@ ColoringBook.prototype.toolIcons = {
     const $fullscreenButton = this.$container.find('.h5p-coloring-book-tool-button[aria-label="Fullscreen"]');
     if ($fullscreenButton.length) {
       this.on('enterFullScreen', function () {
-        $fullscreenButton.find('svg').replaceWith($(self.toolIcons.exitFullscreen));
+        $fullscreenButton.find('svg').replaceWith(H5P.jQuery(self.toolIcons.exitFullscreen));
         $fullscreenButton.attr('title', 'Exit Fullscreen').attr('aria-label', 'Exit Fullscreen');
       });
       this.on('exitFullScreen', function () {
-        $fullscreenButton.find('svg').replaceWith($(self.toolIcons.fullscreen));
+        $fullscreenButton.find('svg').replaceWith(H5P.jQuery(self.toolIcons.fullscreen));
         $fullscreenButton.attr('title', 'Fullscreen').attr('aria-label', 'Fullscreen');
       });
     }
@@ -174,10 +170,10 @@ ColoringBook.prototype.toolIcons = {
 
   ColoringBook.prototype.createToolbar = function () {
     const self = this;
-    const $toolbar = $('<div>').addClass('h5p-coloring-book-toolbar');
+    const $toolbar = H5P.jQuery('<div>').addClass('h5p-coloring-book-toolbar');
 
     // --- First Row: Main Tools ---
-    const $mainToolsRow = $('<div>').addClass('h5p-coloring-book-toolbar-row h5p-coloring-book-main-tools');
+    const $mainToolsRow = H5P.jQuery('<div>').addClass('h5p-coloring-book-toolbar-row h5p-coloring-book-main-tools');
 
     $mainToolsRow.append(this.createToolButton('brush', 'Brush'));
     if (this.params.tools.enableEraser) {
@@ -218,22 +214,22 @@ ColoringBook.prototype.toolIcons = {
     $toolbar.append($mainToolsRow);
 
     // --- Second Row: Colors and Brush Size ---
-    const $secondaryControlsRow = $('<div>').addClass('h5p-coloring-book-toolbar-row h5p-coloring-book-secondary-controls');
+    const $secondaryControlsRow = H5P.jQuery('<div>').addClass('h5p-coloring-book-toolbar-row h5p-coloring-book-secondary-controls');
 
-    const $colorPalette = $('<div>').addClass('h5p-coloring-book-color-palette');
+    const $colorPalette = H5P.jQuery('<div>').addClass('h5p-coloring-book-color-palette');
     this.colors.forEach(function (color) {
       $colorPalette.append(self.createColorButton(color));
     });
     $secondaryControlsRow.append($colorPalette);
 
-    const $brushSize = $('<div>').addClass('h5p-coloring-book-brush-size').append(
-      $('<label>').text('Brush Size: '),
-      $('<input>', {
+    const $brushSize = H5P.jQuery('<div>').addClass('h5p-coloring-book-brush-size').append(
+      H5P.jQuery('<label>').text('Brush Size: '),
+      H5P.jQuery('<input>', {
         type: 'range',
         min: 1,
         max: 50,
         value: this.brushSize,
-        change: function () { self.brushSize = $(this).val(); }
+        change: function () { self.brushSize = H5P.jQuery(this).val(); }
       })
     );
     $secondaryControlsRow.append($brushSize);
@@ -245,7 +241,7 @@ ColoringBook.prototype.toolIcons = {
 
   ColoringBook.prototype.createToolButton = function (tool, label) {
     const self = this;
-    const $button = $('<div>', {
+    const $button = H5P.jQuery('<div>', {
       class: 'h5p-coloring-book-tool-button',
       role: 'button',
       tabindex: 0,
@@ -254,7 +250,7 @@ ColoringBook.prototype.toolIcons = {
 
     const iconSvg = this.toolIcons[tool];
     if (iconSvg) {
-      $button.append($(iconSvg)).attr('aria-label', label);
+      $button.append(H5P.jQuery(iconSvg)).attr('aria-label', label);
     } else {
       $button.text(label);
     }
@@ -286,8 +282,8 @@ ColoringBook.prototype.toolIcons = {
           e.preventDefault();
           self.currentTool = tool;
           self.$canvas.css('cursor', 'text');
-          $(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
-          $(this).addClass('active');
+          H5P.jQuery(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
+          H5P.jQuery(this).addClass('active');
         }
       });
     } else {
@@ -297,8 +293,8 @@ ColoringBook.prototype.toolIcons = {
           self.currentTool = tool;
           self.$canvas.css('cursor', 'crosshair'); // Default cursor for drawing tools
           if (tool === 'brush' || tool === 'eraser' || tool === 'fill') {
-            $(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
-            $(this).addClass('active');
+            H5P.jQuery(this).closest('.h5p-coloring-book-toolbar').find('.h5p-coloring-book-tool-button').removeClass('active');
+            H5P.jQuery(this).addClass('active');
           }
         }
       });
@@ -309,7 +305,7 @@ ColoringBook.prototype.toolIcons = {
 
   ColoringBook.prototype.createColorButton = function (color) {
     const self = this;
-    return $('<div>', {
+    return H5P.jQuery('<div>', {
       class: 'h5p-coloring-book-color-button',
       role: 'button',
       tabindex: 0,
@@ -319,7 +315,7 @@ ColoringBook.prototype.toolIcons = {
       if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         self.currentColor = color;
-        $(this).addClass('active').siblings().removeClass('active');
+        H5P.jQuery(this).addClass('active').siblings().removeClass('active');
       }
     });
   };
@@ -529,14 +525,14 @@ ColoringBook.prototype.toolIcons = {
     // Directly trigger hidden file input for local upload
     let $fileInput = this.$container.find('.h5p-coloring-book-file-input');
     if (!$fileInput.length) {
-      $fileInput = $('<input type="file" class="h5p-coloring-book-file-input" accept="image/*" style="display:none">')
+      $fileInput = H5P.jQuery('<input type="file" class="h5p-coloring-book-file-input" accept="image/*" style="display:none">')
         .on('change', function (e) {
           const file = e.target.files[0];
           if (file) {
             // Basic file size check (e.g., 5MB)
             if (file.size > 5 * 1024 * 1024) {
               alert("File is too large. Please choose an image under 5MB.");
-              $(this).val(''); // Reset file input for next use
+              H5P.jQuery(this).val(''); // Reset file input for next use
               return;
             }
             const reader = new FileReader();
@@ -547,7 +543,7 @@ ColoringBook.prototype.toolIcons = {
               alert("Error reading file.");
             };
             reader.readAsDataURL(file);
-            $(this).val(''); // Reset file input for next use
+            H5P.jQuery(this).val(''); // Reset file input for next use
           }
         });
       this.$container.append($fileInput);
@@ -629,4 +625,4 @@ ColoringBook.prototype.toolIcons = {
   };
 
   return ColoringBook;
-})(window.jQuery || H5P.jQuery);
+})();
