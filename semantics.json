@@ -118,6 +118,12 @@
         "default": "Undo"
       },
       {
+        "name": "redo",
+        "type": "text",
+        "label": "Redo button label",
+        "default": "Redo"
+      },
+      {
         "name": "download",
         "type": "text",
         "label": "Download button label",

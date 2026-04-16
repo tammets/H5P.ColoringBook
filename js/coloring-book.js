@@ -35,10 +35,12 @@ H5P.ColoringBook = (function () {
     this.brushSize = this.params.tools.brushSize;
     this.isDrawing = false;
 
-    // For Undo functionality
+    // For Undo/Redo functionality
     this.historyStack = [];
+    this.redoStack = [];
     this.MAX_HISTORY_STATES = 20;
     this.$undoButton = null;
+    this.$redoButton = null;
   }
 
   // Inherit from EventDispatcher
@@ -58,6 +60,7 @@ H5P.ColoringBook = (function () {
     fill: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" /></svg>',
     download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
     undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m15 15-6 6m0 0-6-6m6 6V9a6 6 0 0 1 12 0v3" /></svg>',
+    redo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m9 15 6 6m0 0 6-6m-6 6V9a6 6 0 0 0-12 0v3" /></svg>',
     text: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>',
     loadImage: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>',
     fullscreen: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>',
@@ -98,6 +101,7 @@ H5P.ColoringBook = (function () {
     this.canvas = this.$canvas[0];
     this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
     this.historyStack = [];
+    this.redoStack = [];
 
     // Load background image or restore previous state
     if (this.previousState) {
@@ -109,6 +113,9 @@ H5P.ColoringBook = (function () {
     this.setupEventListeners();
     if (this.$undoButton) {
       this.updateUndoButtonState();
+    }
+    if (this.$redoButton) {
+      this.updateRedoButtonState();
     }
 
     // Fullscreen event listeners
@@ -226,6 +233,10 @@ H5P.ColoringBook = (function () {
     this.$undoButton = $undoButton;
     $mainToolsRow.append($undoButton);
 
+    var $redoButton = this.createToolButton('redo', this.t('redo', 'Redo'));
+    this.$redoButton = $redoButton;
+    $mainToolsRow.append($redoButton);
+
     var $downloadButton = this.createToolButton('download', this.t('download', 'Download'));
     $downloadButton.addClass('h5p-coloring-book-download-button');
     $mainToolsRow.append($downloadButton);
@@ -298,6 +309,13 @@ H5P.ColoringBook = (function () {
         if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           self.undoLastAction();
+        }
+      }).addClass('disabled');
+    } else if (tool === 'redo') {
+      $button.on('click keydown', function (e) {
+        if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          self.redoLastAction();
         }
       }).addClass('disabled');
     } else if (tool === 'loadImage') {
@@ -608,12 +626,14 @@ H5P.ColoringBook = (function () {
     }
 
     this.historyStack.push(dataUrl);
+    this.redoStack = [];
 
     if (this.historyStack.length > this.MAX_HISTORY_STATES) {
       this.historyStack.shift();
     }
 
     this.updateUndoButtonState();
+    this.updateRedoButtonState();
   };
 
   ColoringBook.prototype.undoLastAction = function () {
@@ -621,7 +641,9 @@ H5P.ColoringBook = (function () {
       return;
     }
 
-    this.historyStack.pop();
+    var undoneState = this.historyStack.pop();
+    this.redoStack.push(undoneState);
+
     var prevStateDataUrl = this.historyStack[this.historyStack.length - 1];
 
     var img = new Image();
@@ -633,6 +655,27 @@ H5P.ColoringBook = (function () {
     img.src = prevStateDataUrl;
 
     this.updateUndoButtonState();
+    this.updateRedoButtonState();
+  };
+
+  ColoringBook.prototype.redoLastAction = function () {
+    if (this.redoStack.length === 0) {
+      return;
+    }
+
+    var redoStateDataUrl = this.redoStack.pop();
+    this.historyStack.push(redoStateDataUrl);
+
+    var img = new Image();
+    var self = this;
+    img.onload = function () {
+      self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
+      self.ctx.drawImage(img, 0, 0);
+    };
+    img.src = redoStateDataUrl;
+
+    this.updateUndoButtonState();
+    this.updateRedoButtonState();
   };
 
   ColoringBook.prototype.promptForImage = function () {
@@ -670,6 +713,7 @@ H5P.ColoringBook = (function () {
     newImage.crossOrigin = 'Anonymous';
     newImage.onload = function () {
       self.historyStack = [];
+      self.redoStack = [];
 
       var naturalWidth = newImage.width;
       var naturalHeight = newImage.height;
@@ -761,6 +805,16 @@ H5P.ColoringBook = (function () {
         this.$undoButton.removeClass('disabled').attr('tabindex', 0).removeAttr('aria-disabled');
       } else {
         this.$undoButton.addClass('disabled').attr('tabindex', -1).attr('aria-disabled', 'true');
+      }
+    }
+  };
+
+  ColoringBook.prototype.updateRedoButtonState = function () {
+    if (this.$redoButton) {
+      if (this.redoStack.length > 0) {
+        this.$redoButton.removeClass('disabled').attr('tabindex', 0).removeAttr('aria-disabled');
+      } else {
+        this.$redoButton.addClass('disabled').attr('tabindex', -1).attr('aria-disabled', 'true');
       }
     }
   };

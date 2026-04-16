@@ -6,7 +6,7 @@ An H5P content type that allows teachers to create interactive coloring book act
 
 This content type enables:
 - Teachers to upload outline images for coloring
-- Customisable drawing tools and colors
+- Customisable drawing tools
 - Students to color and edit images using various tools, including brush, eraser, fill, and text
 - Students can load their own images and download their creations
 - Fullscreen mode for an immersive experience
@@ -18,9 +18,9 @@ This content type enables:
 - **Interactive Student View**:
   - Brush, eraser, fill, and text tools
   - Adjustable brush size
-  - Fixed color palette
+  - Color palette
   - Instructions display
-  - **Undo/Redo**: Revert or reapply changes with a history stack
+  - **Undo**: Revert changes with a history stack
   - **Load Image**: Upload and color your own images
   - **Download Image**: Save your colored artwork as a PNG file
   - **Fullscreen Mode**: Toggle fullscreen for a better coloring experience
@@ -28,7 +28,7 @@ This content type enables:
 
 ## Installation
 
-1. Download the `.h5p` file or package
+1. Download the latest `.h5p` file from [GitHub Releases](https://github.com/tammets/H5P.ColoringBook/releases)
 2. Upload it to your H5P-enabled platform (Moodle, WordPress, Drupal, etc.)
 3. Create a new activity and select "Coloring Book" from the content type list
 
@@ -54,6 +54,14 @@ This content type enables:
 7. Undo your last action using the "Undo" button.
 8. Download your finished coloring as a PNG image using the "Download" button.
 9. Toggle fullscreen mode.
+
+## Development
+
+1. Clone into the `libraries/` folder of your [h5p-cli](https://h5p.org/h5p-cli-guide) project as `H5P.ColoringBook-1.0`
+2. Run `h5p server` from the h5p-dev root directory
+3. Open the dev server URL in your browser — changes to JS/CSS are picked up on refresh
+
+To build a distributable `.h5p` package, run `h5p pack`.
 
 ## Contributing
 
