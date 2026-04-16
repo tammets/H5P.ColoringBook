@@ -1,0 +1,170 @@
+[
+  {
+    "name": "coloringBook",
+    "type": "group",
+    "label": "Coloring Book Settings",
+    "fields": [
+      {
+        "name": "image",
+        "type": "image",
+        "label": "Image to Color",
+        "description": "Upload an image that users will color. If no image is provided, a blank canvas will be used.",
+        "importance": "high"
+      },
+      {
+        "name": "maxWidth",
+        "type": "number",
+        "label": "Maximum Image Width",
+        "description": "Set the maximum width for the coloring image in pixels. The image will be scaled down to fit if it's larger.",
+        "default": 800,
+        "min": 100
+      },
+      {
+        "name": "maxHeight",
+        "type": "number",
+        "label": "Maximum Image Height",
+        "description": "Set the maximum height for the coloring image in pixels. The image will be scaled down to fit if it's larger.",
+        "default": 600,
+        "min": 100
+      },
+      {
+        "name": "tools",
+        "type": "group",
+        "label": "Drawing Tools",
+        "fields": [
+          {
+            "name": "brushSize",
+            "type": "number",
+            "label": "Default Brush Size",
+            "description": "Size of the brush in pixels",
+            "default": 10,
+            "min": 1,
+            "max": 50
+          },
+          {
+            "name": "enableEraser",
+            "type": "boolean",
+            "label": "Enable Eraser Tool",
+            "description": "Allow users to erase their coloring",
+            "default": true
+          },
+          {
+            "name": "enableFill",
+            "type": "boolean",
+            "label": "Enable Fill Tool",
+            "description": "Allow users to fill areas with color",
+            "default": true
+          },
+          {
+            "name": "enableTextTool",
+            "type": "boolean",
+            "label": "Enable Text Tool",
+            "description": "Allow users to add text to the image",
+            "default": true
+          }
+        ]
+      },
+      {
+        "name": "instructions",
+        "type": "text",
+        "label": "Instructions",
+        "description": "Instructions for the user",
+        "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas.",
+        "widget": "textarea"
+      }
+    ]
+  },
+  {
+    "name": "l10n",
+    "type": "group",
+    "common": true,
+    "label": "User interface",
+    "importance": "low",
+    "fields": [
+      {
+        "name": "brush",
+        "type": "text",
+        "label": "Brush tool label",
+        "default": "Brush"
+      },
+      {
+        "name": "eraser",
+        "type": "text",
+        "label": "Eraser tool label",
+        "default": "Eraser"
+      },
+      {
+        "name": "fill",
+        "type": "text",
+        "label": "Fill tool label",
+        "default": "Fill"
+      },
+      {
+        "name": "addText",
+        "type": "text",
+        "label": "Text tool label",
+        "default": "Add Text"
+      },
+      {
+        "name": "loadImage",
+        "type": "text",
+        "label": "Load image button label",
+        "default": "Load Image"
+      },
+      {
+        "name": "undo",
+        "type": "text",
+        "label": "Undo button label",
+        "default": "Undo"
+      },
+      {
+        "name": "download",
+        "type": "text",
+        "label": "Download button label",
+        "default": "Download"
+      },
+      {
+        "name": "fullscreen",
+        "type": "text",
+        "label": "Fullscreen button label",
+        "default": "Fullscreen"
+      },
+      {
+        "name": "exitFullscreen",
+        "type": "text",
+        "label": "Exit fullscreen button label",
+        "default": "Exit Fullscreen"
+      },
+      {
+        "name": "brushSize",
+        "type": "text",
+        "label": "Brush size label",
+        "default": "Brush Size: "
+      },
+      {
+        "name": "enterText",
+        "type": "text",
+        "label": "Text input prompt",
+        "default": "Enter text:"
+      },
+      {
+        "name": "fileTooLarge",
+        "type": "text",
+        "label": "File too large error",
+        "default": "File is too large. Please choose an image under 5MB."
+      },
+      {
+        "name": "errorReadingFile",
+        "type": "text",
+        "label": "Error reading file message",
+        "default": "Error reading file."
+      },
+      {
+        "name": "errorLoadingImage",
+        "type": "text",
+        "label": "Error loading image message",
+        "default": "Error loading image. Please check the file."
+      }
+    ]
+  }
+]

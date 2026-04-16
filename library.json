@@ -3,12 +3,13 @@
   "description": "A coloring book content type that allows users to color predefined images",
   "majorVersion": 1,
   "minorVersion": 0,
-  "patchVersion": 27,
+  "patchVersion": 28,
   "runnable": 1,
   "author": "Priit Tammets",
   "license": "MIT",
   "icon": "icon.svg",
   "machineName": "H5P.ColoringBook",
+  "contentType": "Interactive",
   "preloadedJs": [
     {
       "path": "js/coloring-book.js"

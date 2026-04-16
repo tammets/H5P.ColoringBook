@@ -7,6 +7,7 @@
 }
 
 .h5p-coloring-book-canvas-container {
+  position: relative;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -15,7 +16,7 @@
   max-width: 100%; /* Ensure the container doesn't exceed its parent's width */
 }
 
-canvas {
+.h5p-coloring-book canvas {
   max-width: 100%;
   height: auto;
   display: block; /* Remove extra space below the canvas */
@@ -127,6 +128,65 @@ canvas {
   border-left: 4px solid #007bff;
   border-radius: 4px;
   color: #000;
+}
+
+/* Inline text input overlay */
+.h5p-coloring-book-text-input-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+}
+
+.h5p-coloring-book-text-input {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.h5p-coloring-book-text-ok,
+.h5p-coloring-book-text-cancel {
+  padding: 4px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 13px;
+  background: #f0f0f0;
+}
+
+.h5p-coloring-book-text-ok:hover {
+  background: #007bff;
+  color: #fff;
+  border-color: #0056b3;
+}
+
+.h5p-coloring-book-text-cancel:hover {
+  background: #e0e0e0;
+}
+
+/* Non-blocking notification */
+.h5p-coloring-book-notification {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 10;
+  pointer-events: none;
 }
 
 /* Responsive adjustments */
