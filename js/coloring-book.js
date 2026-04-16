@@ -7,6 +7,7 @@ H5P.ColoringBook = (function () {
     H5P.EventDispatcher.call(this);
 
     this.params = (params && params.coloringBook) ? params.coloringBook : {};
+    this.image = (params && params.image) ? params.image : (this.params.image || null);
     this.l10n = (params && params.l10n) ? params.l10n : {};
 
     // Initialize colors
@@ -14,14 +15,17 @@ H5P.ColoringBook = (function () {
       '#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF',
       '#800080', '#FFC0CB', '#FFFFFF', '#8B4513', '#000000'
     ];
-    this.colors = defaultFallbackColors;
+    var configuredColors = (this.params.palette && Array.isArray(this.params.palette) && this.params.palette.length > 0)
+      ? this.params.palette
+      : null;
+    this.colors = configuredColors || defaultFallbackColors;
 
     this.params.tools = this.params.tools || {};
     this.params.tools.brushSize = this.params.tools.brushSize || 10;
     this.params.tools.enableEraser = this.params.tools.enableEraser !== false;
     this.params.tools.enableFill = this.params.tools.enableFill !== false;
     this.params.tools.enableTextTool = this.params.tools.enableTextTool === true;
-    this.params.instructions = this.params.instructions || '';
+    this.instructions = (params && params.instructions) ? params.instructions : (this.params.instructions || '');
 
     this.id = id;
     this.previousState = (contentData && contentData.previousState) ? contentData.previousState : null;
@@ -57,7 +61,7 @@ H5P.ColoringBook = (function () {
   ColoringBook.prototype.toolIcons = {
     brush: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>',
     eraser: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M20.454 19.028h-7.01l6.62-6.63a2.94 2.94 0 0 0 .87-2.09a2.84 2.84 0 0 0-.87-2.05l-3.42-3.44a2.93 2.93 0 0 0-4.13.01L3.934 13.4a2.946 2.946 0 0 0 0 4.14l1.48 1.49h-1.86a.5.5 0 0 0 0 1h16.9a.5.5 0 0 0 0-1.002m-7.24-13.5a1.956 1.956 0 0 1 2.73 0l3.42 3.44a1.87 1.87 0 0 1 .57 1.35a1.93 1.93 0 0 1-.57 1.37l-5.64 5.64l-6.15-6.16Zm-1.19 13.5h-5.2l-2.18-2.2a1.93 1.93 0 0 1 0-2.72l2.23-2.23l6.15 6.15Z"/></svg>',
-    fill: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" /></svg>',
+    fill: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" class="size-6"><path fill="currentColor" d="M13 14.5c.468-2.207.985-4.05 1.604-5.846c.411 1.796.928 3.638 1.337 5.521C16 15.328 15.329 16 14.5 16s-1.5-.672-1.5-1.5zM8 1L6.56 2.44l-2-2a1.539 1.539 0 0 0-2.121 0a1.496 1.496 0 0 0 .001 2.119l2 2L0 8.999l7 7l8-8zm0 1.41L13.59 8H2.41l2.75-2.75a.49.49 0 0 0 .669-.672l.721-.718l1.54 1.53a.502.502 0 0 0 .71-.71L7.27 3.15zm-4.85-.56a.5.5 0 0 1 .355-.854c.138 0 .263.055.355.144l2 2l-.71.71z"/></svg>',
     download: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>',
     undo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m15 15-6 6m0 0-6-6m6 6V9a6 6 0 0 1 12 0v3" /></svg>',
     redo: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m9 15 6 6m0 0 6-6m-6 6V9a6 6 0 0 0-12 0v3" /></svg>',
@@ -89,8 +93,8 @@ H5P.ColoringBook = (function () {
 
     var $toolbar = this.createToolbar();
 
-    if (this.params.instructions) {
-      var instructionsText = this.params.instructions.replace(/\n/g, '<br>');
+    if (this.instructions) {
+      var instructionsText = this.instructions.replace(/\n/g, '<br>');
       $container.append(H5P.jQuery('<div>').addClass('h5p-coloring-book-instructions').html(instructionsText));
     }
 
@@ -174,8 +178,8 @@ H5P.ColoringBook = (function () {
       self.trigger('resize');
     };
 
-    if (this.params.image && this.params.image.path) {
-      image.src = H5P.getPath(this.params.image.path, this.id);
+    if (this.image && this.image.path) {
+      image.src = H5P.getPath(this.image.path, this.id);
     } else {
       image.dispatchEvent(new Event('error'));
     }

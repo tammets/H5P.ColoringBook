@@ -1,16 +1,25 @@
 [
   {
+    "name": "instructions",
+    "type": "text",
+    "label": "Instructions",
+    "description": "Instructions for the user",
+    "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas.",
+    "importance": "high",
+    "widget": "textarea"
+  },
+  {
+    "name": "image",
+    "type": "image",
+    "label": "Image to Color",
+    "description": "Upload an image that users will color. If no image is provided, a blank canvas will be used.",
+    "importance": "high"
+  },
+  {
     "name": "coloringBook",
     "type": "group",
     "label": "Coloring Book Settings",
     "fields": [
-      {
-        "name": "image",
-        "type": "image",
-        "label": "Image to Color",
-        "description": "Upload an image that users will color. If no image is provided, a blank canvas will be used.",
-        "importance": "high"
-      },
       {
         "name": "maxWidth",
         "type": "number",
@@ -65,12 +74,29 @@
         ]
       },
       {
-        "name": "instructions",
-        "type": "text",
-        "label": "Instructions",
-        "description": "Instructions for the user",
-        "default": "Color the image using the tools below. Click and drag to draw, or use the fill tool to color larger areas.",
-        "widget": "textarea"
+        "name": "palette",
+        "type": "group",
+        "label": "Color Palette",
+        "fields": [
+          {
+            "name": "colors",
+            "type": "list",
+            "label": "Colors",
+            "description": "Add colors to customize the palette. If no colors are added, a default set of 10 colors will be used.",
+            "importance": "medium",
+            "entity": "color",
+            "field": {
+              "name": "color",
+              "type": "text",
+              "label": "Color (hex code, e.g. #FF0000)",
+              "default": "#000000",
+              "regexp": {
+                "pattern": "^#([0-9a-fA-F]{6})$",
+                "modifiers": ""
+              }
+            }
+          }
+        ]
       }
     ]
   },
